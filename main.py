@@ -28,12 +28,20 @@ def resultant(list):
     
     return result
     
+def deviation(num,list1):
+    radiation = 0
+    for val in list1:
+        distance = int(((num[0]-val[0])**2 + (num[1]-val[1])**2)**0.5)
+        if distance > radiation:
+            radiation = distance
+    return radiation
+    
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
    
 if (cap.isOpened()== False):  
   print("Error opening video  file")
 ret, frame = cap.read()  
-n =  int((frame.shape[0]*frame.shape[1])**0.5)
+n =  10*int((frame.shape[0]*frame.shape[1])**0.5)
 
 while(cap.isOpened()): 
     m = 0
@@ -49,11 +57,15 @@ while(cap.isOpened()):
 
     if ret == True: 
         if len(points) > 0:
-            aim = resultant(points)  
-            frame[aim[0] - 20 : aim[0] + 20, aim[1] - 20 : aim[1] + 20 ,:] = (0,0,0)
+            aim = tuple(resultant(points))
+            radius = deviation(aim, points)
+            img = cv2.circle(frame, (aim[1],aim[0]), radius, (80, 246, 19), 2)
+            done = True
+            frame[aim[0] - int(radius/4) : aim[0] + int(radius/4), aim[1] - 1 : aim[1] + 1 ,:] = (80, 246, 19)
+            frame[aim[0] - 1 : aim[0] + 1, aim[1] - int(radius/4) : aim[1] + int(radius/4) ,:] = (80, 246, 19)
         points.clear()
         cv2.imshow('Frame', frame) 
-
+        
         if cv2.waitKey(25) & 0xFF == ord('q'): 
             break
 
